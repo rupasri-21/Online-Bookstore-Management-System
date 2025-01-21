@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Bookstore</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Online Bookstore</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Books Available</h2>
+            <div id="book-list">
+                <!-- Books will be dynamically loaded here -->
+            </div>
+        </section>
+        <section>
+            <h2>Place an Order</h2>
+            <form id="order-form">
+                <label for="book-id">Book ID:</label>
+                <input type="number" id="book-id" required>
+                <label for="customer-name">Your Name:</label>
+                <input type="text" id="customer-name" required>
+                <button type="submit">Order Now</button>
+            </form>
+        </section>
+    </main>
+    <script>
+        // Fetch and display books
+        fetch('/books')
+            .then(response => response.json())
+            .then(data => {
+                const bookList = document.getElementById('book-list');
+                data.forEach(book => {
+                    const bookItem = `<p>Book ID: ${book.id}, Title: ${book.title}, Price: $${book.price}</p>`;
+                    bookList.innerHTML += bookItem;
+                });
+            });
+
+        // Handle form submission
+        document.getElementById('order-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const bookId = document.getElementById('book-id').value;
+            const customerName = document.getElementById('customer-name').value;
+
+            fetch('/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookId, customerName })
+            })
+                .then(response => response.json())
+                .then(data => alert(data.message));
+        });
+    </script>
+</body>
+</html>
